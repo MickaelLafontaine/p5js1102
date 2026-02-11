@@ -1,7 +1,7 @@
 let mySound;
 let amp;
 function preload() {
-  mySound = loadSound('/assets/horn.wav');
+  mySound = loadSound('assets/horn.wav');
 }
 
 function setup() {
