@@ -81,6 +81,7 @@ function draw(){
     let cell = getGridCell(mouseX, mouseY);
     print("Case: " + cell.id + " (x:" + cell.x + ", y:" + cell.y + ")");
     
+    /** 
     if(cell.id === 0 && !mySound.isPlaying()) {
       mySound.play();
     }
@@ -93,6 +94,7 @@ function draw(){
     if(cell.id === 3 && !mySound.isPlaying()) {
       mySound.play();
     }
+    */
    }
 
      
@@ -125,6 +127,21 @@ function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 }
 
+function touchStarted() {
+  userStartAudio(); // aide si l'audio est bloqué par la politique du navigateur
+  let cell = getGridCell(touchX, touchY);
+  if (cell.id === 0 && !mySound.isPlaying()) {
+    mySound.play();
+  }
+  return false; // empêche le scroll par défaut sur mobile
+}
+
+function mousePressed() {
+  let cell = getGridCell(mouseX, mouseY);
+  if (cell.id === 0 && !mySound.isPlaying()) {
+    mySound.play();
+  }
+}
 
 
 /** 
