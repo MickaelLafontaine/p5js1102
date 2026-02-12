@@ -1,13 +1,24 @@
 let mySound;
 let amp;
+let mouseGrid_Res = 2;
+let mouseGridX = [];
+let mouseGridY = [];
+
 function preload() {
   mySound = loadSound('assets/horn.wav');
 }
 
 function setup() {
 
-  //let cnv = createCanvas(1000, 1000);
-  createCanvas(1000, 1000);
+  createCanvas(windowWidth, windowHeight);
+  for(let i = 0 ; i < windowWidth ; i+=windowWidth/mouseGrid_Res){
+    mouseGridX.push(i);
+  }
+  for(let i = 0 ; i < windowHeight ; i+=windowHeight/mouseGrid_Res){
+    mouseGridY.push(i);
+  }
+  //print("mouseGridX[1] = " + mouseGridX[1]);
+  //print("mouseGridY = " + mouseGridY);
   colorMode(HSB,360,100,100,100);
   rectMode(CENTER);
   background(220);
@@ -20,6 +31,7 @@ function setup() {
 function draw(){
   print("amp.getLevel() = " + amp.getLevel());
   background(0,100,0);
+
   if(mySound.isPlaying()){
      //for(int i = 0 ; i<)
      push();
@@ -38,11 +50,34 @@ function draw(){
         }
    }
 
-   if(mouseIsPressed){
+   if(mouseIsPressed){  
     print(mouseX + " , " + mouseY);
+    // Vérifier si le clic est dans la case en haut à gauche
+    if(mouseX >= 0 && mouseX < mouseGridX[1] && mouseY >= 0 && mouseY < mouseGridY[1]){
+      if (mySound.isPlaying() == false) {
+        mySound.play();
+      }
+    }
    }
 
+     
+  // Dessiner la grille
+  stroke(255);
+  strokeWeight(1);
+  for(let x of mouseGridX) {
+    line(x, 0, x, height);
+  }
+  for(let y of mouseGridY) {
+    line(0, y, width, y);
+  }
+
 }
+
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
+
+
 
 /** 
 function canvasPressed() {
