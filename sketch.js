@@ -1,11 +1,23 @@
-let mySound;
-let amp;
+let audio = [];
+let amp = [];
 let mouseGrid_Res = 3;
 let mouseGridX = [];
 let mouseGridY = [];
+let infoON = true;// pour dessiner la grille d'interaction (smartphone)
 
 function preload() {
-  mySound = loadSound('assets/horn.wav');
+    // on charge les fichiers audio
+  audio[0] = loadSound('assets/audio1.wav');
+  audio[1] = loadSound('assets/audio3.wav');
+  audio[2] = loadSound('assets/audio4.wav');
+  audio[3] = loadSound('assets/audio6.wav');
+  audio[4] = loadSound('assets/audio11.wav');
+  audio[5] = loadSound('assets/audio12.wav');
+  audio[6] = loadSound('assets/audio23.wav');
+  audio[7] = loadSound('assets/audio24.wav');
+  audio[8] = loadSound('assets/audio25.wav');
+
+  print("audio.length = " + audio.length);
 }
 
 function setup() {
@@ -24,10 +36,15 @@ function setup() {
   colorMode(HSB,360,100,100,100);
   rectMode(CENTER);
   background(220);
-  text('tap here to play', 10, 20);
-  
-  amp = new p5.Amplitude();
-  amp.setInput(mySound);
+  //text('tap here to play', 10, 20);
+
+
+  for(let i = 0 ; i < audio.length ; i++){
+    audio[i].setVolume(0.5); 
+    amp[i] = new p5.Amplitude();// on peut régler ici les paramètres de l'analyseur de son (ex: smoothing) : https://p5js.org/reference/#/p5.Amplitude 
+    amp[i].setInput(audio[i]);
+  }
+
 }
 
 // Retourne le numéro de la case cliquée (0 = première case en haut à gauche)
@@ -56,45 +73,25 @@ function getGridCell(mx, my) {
 }
 
 function draw(){
-  print("amp.getLevel() = " + amp.getLevel());
   background(0,100,0);
 
-  if(mySound.isPlaying()){
+  if(audio[0].isPlaying()){
      //for(int i = 0 ; i<)
      push();
      translate(width/2,height/2);
-     rotate((mySound.currentTime()*2));
-     scale(amp.getLevel()*10);
+     rotate((audio[0].currentTime()*2));
+     let cell = getGridCell(mouseX, mouseY);
+     scale(amp[0].getLevel()*10);
      fill(0,100,100);
      square(0,0,200)
      pop();
-   }
-
-   //if(keyIsDown && key == 'a'){
-   if(keyIsPressed && key == 'a'){
-        if (mySound.isPlaying() == false) {
-            mySound.play();
-        }
    }
 
    if(mouseIsPressed){
     let cell = getGridCell(mouseX, mouseY);
     print("Case: " + cell.id + " (x:" + cell.x + ", y:" + cell.y + ")");
     
-    /** 
-    if(cell.id === 0 && !mySound.isPlaying()) {
-      mySound.play();
-    }
-    if(cell.id === 1 && !mySound.isPlaying()) {
-      mySound.play();
-    }
-    if(cell.id === 2 && !mySound.isPlaying()) {
-      mySound.play();
-    }
-    if(cell.id === 3 && !mySound.isPlaying()) {
-      mySound.play();
-    }
-    */
+  
    }
 
      
@@ -108,16 +105,18 @@ function draw(){
     line(0, y, width, y);
   }
   
-  // Afficher les numéros de case
-  fill(255);
-  textAlign(CENTER, CENTER);
-  textSize(20);
-  for(let y = 0; y < mouseGrid_Res; y++) {
-    for(let x = 0; x < mouseGrid_Res; x++) {
-      let cellId = y * mouseGrid_Res + x;
-      let cellCenterX = mouseGridX[x] + (mouseGridX[x + 1] - mouseGridX[x]) / 2;
-      let cellCenterY = mouseGridY[y] + (mouseGridY[y + 1] - mouseGridY[y]) / 2;
-      text(cellId, cellCenterX, cellCenterY);
+  if(infoON){
+    // Afficher les numéros de case
+    fill(255);
+    textAlign(CENTER, CENTER);
+    textSize(20);
+    for(let y = 0; y < mouseGrid_Res; y++) {
+      for(let x = 0; x < mouseGrid_Res; x++) {
+        let cellId = y * mouseGrid_Res + x;
+        let cellCenterX = mouseGridX[x] + (mouseGridX[x + 1] - mouseGridX[x]) / 2;
+        let cellCenterY = mouseGridY[y] + (mouseGridY[y + 1] - mouseGridY[y]) / 2;
+        text(cellId, cellCenterX, cellCenterY);
+      }
     }
   }
 
@@ -129,24 +128,36 @@ function windowResized() {
 
 function touchStarted() {
   userStartAudio(); // aide si l'audio est bloqué par la politique du navigateur
-  let cell = getGridCell(touchX, touchY);
-  if (cell.id === 0 && !mySound.isPlaying()) {
-    mySound.play();
-  }
+  if (touches.length > 0) {
+    let cell = getGridCell(touches[0].x, touches[0].y);
+    for(let i = 0 ; i < audio.length ; i++){
+      if (cell.id === i && !audio[i].isPlaying()) {
+        audio[i].play();
+      }
+    }
     // Mark each touch point once with a circle.
-  for (let touch of touches) {
-    circle(touch.x, touch.y, 40);
+    for (let touch of touches) {
+      circle(touch.x, touch.y, 40);
+    }
   }
   return false; // empêche le scroll par défaut sur mobile
 }
 
 function mousePressed() {
   let cell = getGridCell(mouseX, mouseY);
-  if (cell.id === 0 && !mySound.isPlaying()) {
-    mySound.play();
+  for(let i = 0 ; i < audio.length ; i++){
+    if (cell.id === i && !audio[i].isPlaying()) {
+      audio[i].play();
+    }
   }
 }
 
+
+function keyPressed() {
+    if (key == 'a' && !audio[0].isPlaying()) {
+      audio[0].play();
+    }
+}
 
 /** 
 function canvasPressed() {
