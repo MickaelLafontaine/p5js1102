@@ -1,13 +1,14 @@
 let mySound;
 let amp;
 function preload() {
-  mySound = loadSound('assets/horn.wav');
+  mySound = loadSound('/assets/horn.wav');
 }
 
 function setup() {
 
   //let cnv = createCanvas(1000, 1000);
-  createCanvas(1000, 1000);
+  fullscreen();
+  //createCanvas(1000, 1000);
   colorMode(HSB,360,100,100,100);
   rectMode(CENTER);
   background(220);
