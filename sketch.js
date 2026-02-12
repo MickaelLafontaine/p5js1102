@@ -133,6 +133,10 @@ function touchStarted() {
   if (cell.id === 0 && !mySound.isPlaying()) {
     mySound.play();
   }
+    // Mark each touch point once with a circle.
+  for (let touch of touches) {
+    circle(touch.x, touch.y, 40);
+  }
   return false; // empêche le scroll par défaut sur mobile
 }
 
