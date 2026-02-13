@@ -1,9 +1,12 @@
+let smoothingFactor = 0.5;// pour lisser les valeurs d'amplitude (0 = pas de lissage, 1 = lissage total)
 let audio = [];
 let amp = [];
+let amp_smooth = [];
 let mouseGrid_Res = 3;
 let mouseGridX = [];
 let mouseGridY = [];
 let infoON = true;// pour dessiner la grille d'interaction (smartphone)
+let univers1 = true;// pour basculer entre les univers 1 et 2 (touche espace)
 
 function preload() {
     // on charge les fichiers audio - changé en MP3 pour meilleure compatibilité mobile
@@ -40,9 +43,11 @@ function setup() {
 
 
   for(let i = 0 ; i < audio.length ; i++){
-    audio[i].setVolume(0.5); 
-    amp[i] = new p5.Amplitude();// on peut régler ici les paramètres de l'analyseur de son (ex: smoothing) : https://p5js.org/reference/#/p5.Amplitude 
+    //audio[i].setVolume(0.5); 
+    amp[i] = new p5.Amplitude(0.5);// on peut régler ici les paramètres de l'analyseur de son (ex: smoothing) : https://p5js.org/reference/#/p5.Amplitude 
     amp[i].setInput(audio[i]);
+    amp[i].toggleNormalize();
+    amp_smooth[i] = 0; // initialiser le smooth
   }
 
 }
@@ -73,43 +78,76 @@ function getGridCell(mx, my) {
 }
 
 function draw(){
-  background(0,100,0);
 
   for(let i = 0 ; i < audio.length ; i++){
+    amp_smooth[i] += (amp[i].getLevel() - amp_smooth[i])*smoothingFactor;
+  }
+
+  if(univers1){
+    background(0,100,0);
+  }
+  else{
+    background(0,0,100);
+  }
+
+  if(audio[0].isPlaying()){
+
+  }
+  if(univers1){
+    if(audio[2].isPlaying()){
+      print("amp[2].getLevel() = " + amp[2].getLevel());
+      let flash = map(amp[2].getLevel(), 0, 0.6, 0, 100); 
+      background(0,100,100,flash);
+    }
+  }
+  else{    
+    if(audio[2].isPlaying()){
+      //print("amp[2].getLevel() = " + amp[2].getLevel()); // pour choisir la valeur du 3e paramètre de la ligne suivante
+      let flash = map(amp[2].getLevel(), 0, 0.6, 0, 100); 
+      noStroke();
+      fill(0,100,100,flash);
+      for(let i = 0 ; i < windowWidth+100 ; i+=windowWidth/10-5){
+        circle(i,0,windowWidth/10);
+        circle(i,windowHeight,windowWidth/10 );
+      }
+    }
+  }
+
+  // Animations standards pour tester que tout fonctionne bien
+  /** 
+  for(let i = 0 ; i < audio.length ; i++){
   if(audio[i].isPlaying()){
-     //for(int i = 0 ; i<)
      push();
      translate(width/2,height/2);
      rotate((audio[i].currentTime()*2));
      let cell = getGridCell(mouseX, mouseY);
-     scale(amp[i].getLevel()*10);
+     scale(amp_smooth[i]*5);
      fill(map(i,0,audio.length,0,360),100,100,50);
      square(0,0,200);
      pop();
    }
   }
+  */
 
 
 
    if(mouseIsPressed){
     let cell = getGridCell(mouseX, mouseY);
     print("Case: " + cell.id + " (x:" + cell.x + ", y:" + cell.y + ")");
-    
-  
    }
 
-     
-  // Dessiner la grille
-  stroke(255);
-  strokeWeight(1);
-  for(let x of mouseGridX) {
-    line(x, 0, x, height);
-  }
-  for(let y of mouseGridY) {
-    line(0, y, width, y);
-  }
+
   
-  if(infoON){
+  if(infoON){     
+    // Dessiner la grille
+    stroke(255);
+    strokeWeight(1);
+    for(let x of mouseGridX) {
+      line(x, 0, x, height);
+    }
+    for(let y of mouseGridY) {
+      line(0, y, width, y);
+    }
     // Afficher les numéros de case
     fill(255);
     textAlign(CENTER, CENTER);
@@ -158,6 +196,10 @@ function mousePressed() {
 
 
 function keyPressed() {
+    if(key == ' '){
+      univers1 = !univers1;
+      print("univers1 = " + univers1);
+    }
     if (key == 'a' && !audio[0].isPlaying()) {
       audio[0].play();
     }
