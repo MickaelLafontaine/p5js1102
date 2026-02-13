@@ -75,17 +75,21 @@ function getGridCell(mx, my) {
 function draw(){
   background(0,100,0);
 
-  if(audio[0].isPlaying()){
+  for(let i = 0 ; i < audio.length ; i++){
+  if(audio[i].isPlaying()){
      //for(int i = 0 ; i<)
      push();
      translate(width/2,height/2);
-     rotate((audio[0].currentTime()*2));
+     rotate((audio[i].currentTime()*2));
      let cell = getGridCell(mouseX, mouseY);
-     scale(amp[0].getLevel()*10);
-     fill(0,100,100);
-     square(0,0,200)
+     scale(amp[i].getLevel()*10);
+     fill(map(i,0,audio.length,0,360),100,100,50);
+     square(0,0,200);
      pop();
    }
+  }
+
+
 
    if(mouseIsPressed){
     let cell = getGridCell(mouseX, mouseY);
@@ -156,6 +160,30 @@ function mousePressed() {
 function keyPressed() {
     if (key == 'a' && !audio[0].isPlaying()) {
       audio[0].play();
+    }
+    if (key == 'z' && !audio[1].isPlaying()) {
+      audio[1].play();
+    }
+    if (key == 'e' && !audio[2].isPlaying()) {
+      audio[2].play();
+    }
+    if (key == 'r' && !audio[3].isPlaying()) {
+      audio[3].play();
+    }
+    if (key == 't' && !audio[4].isPlaying()) {
+      audio[4].play();
+    }
+    if (key == 'y' && !audio[5].isPlaying()) {
+      audio[5].play();
+    }
+    if (key == 'u' && !audio[6].isPlaying()) {
+      audio[6].play();
+    }
+    if (key == 'i' && !audio[7].isPlaying()) {
+      audio[7].play();
+    }
+    if (key == 'o' && !audio[8].isPlaying()) {
+      audio[8].play();
     }
 }
 
