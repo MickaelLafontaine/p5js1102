@@ -1,4 +1,7 @@
 let smoothingFactor = 0.5;// pour lisser les valeurs d'amplitude (0 = pas de lissage, 1 = lissage total)
+let disque_dia = 0;// diamètre du disque qui tourne quand audio[0] est joué
+let rect_apparition = 0;// largeur du rectangle qui grandit quand audio[5] est joué
+let marge = 0;
 let audio = [];
 let amp = [];
 let amp_smooth = [];
@@ -27,6 +30,7 @@ function preload() {
 function setup() {
 
   createCanvas(windowWidth, windowHeight);
+
   for(let i = 0 ; i < windowWidth ; i+=windowWidth/mouseGrid_Res){
     mouseGridX.push(i);
   }
@@ -41,6 +45,9 @@ function setup() {
   rectMode(CENTER);
   background(220);
   //text('tap here to play', 10, 20);
+
+  // On règle la taille du disque afin qu'il soit responsive
+  disque_dia = windowHeight/2; // le disque fera la moitié de la hauteur de l'écran
 
 
   for(let i = 0 ; i < audio.length ; i++){
@@ -92,19 +99,45 @@ function draw(){
     background(0,0,100);
   }
 
-  if(audio[0].isPlaying()){
 
-  }
-  if(univers1){
+  if(univers1){  
+    // PLAN 1 //////////////////////////////////////////////////////   
     if(audio[2].isPlaying()){
-      print("amp[2].getLevel() = " + amp[2].getLevel());
+      //print("amp[2].getLevel() = " + amp[2].getLevel());  // pour régler la valeur du 3e paramètre de la ligne suivante
       let flash = map(amp[2].getLevel(), 0, 0.6, 0, 100); 
-      background(0,100,100,flash);
+      background(color(317, 17, 85, flash));
+    }
+    // PLAN 2 ///////////////////////////////////////////////////////   
+    if(audio[5].isPlaying()){
+      push();
+      rectMode(CORNER);
+      rect_apparition = map(audio[5].currentTime(), 0, audio[5].duration(),0, windowWidth-marge ); 
+      fill('#677AD1');
+      noStroke();
+      rect(marge,height/2-60,rect_apparition-60,30);// on décale de 60 pixels vers le haut
+      rect(marge,height/2,rect_apparition,30);
+      rect(marge,height/2+60,rect_apparition+60,30);// on décale de 60 pixels vers le bas
+      pop();
+    }
+    else{
+      rect_apparition = 0;// on remet à zéro la largeur du rectangle quand le son n'est plus joué
+    }
+    // PLAN ? ////////////////////////////////////////////////////// 
+    if(audio[0].isPlaying()){
+      //print("amp[0].getLevel() = " + amp[0].getLevel());
+      push();
+      translate(width/2,height/2);
+      rotate((audio[0].currentTime()*2));
+      noStroke();
+      fill('#E94956');
+      rect(0,0,disque_dia,25);
+      pop();
     }
   }
   else{    
+    // PLAN 1 //////////////////////////////////////////////////////
     if(audio[2].isPlaying()){
-      //print("amp[2].getLevel() = " + amp[2].getLevel()); // pour choisir la valeur du 3e paramètre de la ligne suivante
+      //print("amp[2].getLevel() = " + amp[2].getLevel()); // pour régler la valeur du 3e paramètre de la ligne suivante
       let flash = map(amp[2].getLevel(), 0, 0.6, 0, 100); 
       noStroke();
       fill(0,100,100,flash);
@@ -112,6 +145,32 @@ function draw(){
         circle(i,0,windowWidth/10);
         circle(i,windowHeight,windowWidth/10 );
       }
+    }
+      // PLAN 2 ///////////////////////////////////////////////////////   
+    if(audio[5].isPlaying()){
+      push();
+      rectMode(CORNER);
+      rect_apparition = map(audio[5].currentTime(), 0, audio[5].duration(),0, windowWidth-marge ); 
+      fill('#677AD1');
+      noStroke();
+      rect(marge,height/2-60,rect_apparition-60,30);// on décale de 60 pixels vers le haut
+      rect(marge,height/2,rect_apparition,30);
+      rect(marge,height/2+60,rect_apparition+60,30);// on décale de 60 pixels vers le bas
+      pop();
+    }
+    else{
+      rect_apparition = 0;// on remet à zéro la largeur du rectangle quand le son n'est plus joué
+    }
+   // PLAN ? ////////////////////////////////////////////////////// 
+    if(audio[0].isPlaying()){
+      //print("amp[0].getLevel() = " + amp[0].getLevel());
+      push();
+      translate(width/2,height/2);
+      rotate((audio[0].currentTime()*2));
+      noStroke();
+      fill('#E94956');
+      rect(0,0,disque_dia,25);
+      pop();
     }
   }
 
