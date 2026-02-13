@@ -7,8 +7,8 @@ let amp = [];
 let amp_smooth = [];
 let mouseGrid_Res = 3;
 let mouseGridX = [];
-let mouseGridY = [];
-let infoON = true;// pour dessiner la grille d'interaction (smartphone)
+let mouseGridY = []; 
+let infoON = false;// pour dessiner la grille d'interaction (smartphone)
 let univers1 = true;// pour basculer entre les univers 1 et 2 (touche espace)
 let universeCheckbox; // checkbox pour basculer les univers
 
@@ -140,7 +140,7 @@ function draw(){
       //print("amp[2].getLevel() = " + amp[2].getLevel()); // pour régler la valeur du 3e paramètre de la ligne suivante
       let flash = map(amp[2].getLevel(), 0, 0.6, 0, 100); 
       noStroke();
-      fill(0,100,100,flash);
+      fill(color(317, 17, 85, flash));
       for(let i = 0 ; i < windowWidth+100 ; i+=windowWidth/10-5){
         circle(i,0,windowWidth/10);
         circle(i,windowHeight,windowWidth/10 );
@@ -225,6 +225,8 @@ function draw(){
 
   // Bouton pour basculer les univers en haut à gauche
   fill(univers1 ? color(0, 100, 100) : color(240, 100, 100));
+  // Bouton pour basculer les univers en haut à gauche
+  fill(univers1 ? color(0, 100, 100) : color(240, 100, 100));
   stroke(255);
   strokeWeight(2);
   rect(25, 25, 30, 30, 5);
@@ -232,6 +234,16 @@ function draw(){
   textAlign(CENTER, CENTER);
   textSize(12);
   text(univers1 ? 'U1' : 'U2', 25, 25);
+
+  // Bouton pour afficher/masquer la grille d'information
+  fill(infoON ? color(60, 100, 100) : color(0, 0, 40));
+  stroke(255);
+  strokeWeight(2);
+  rect(65, 25, 30, 30, 5);
+  fill(255);
+  textAlign(CENTER, CENTER);
+  textSize(12);
+  text(infoON ? 'I' : 'i', 65, 25);
 
 }
 
@@ -242,11 +254,17 @@ function windowResized() {
 function touchStarted() {
   userStartAudio(); // aide si l'audio est bloqué par la politique du navigateur
   if (touches.length > 0) {
-    // Vérifier si on touche le bouton univers en haut à gauche
-    if (touches[0].x > 0 && touches[0].x < 50 && touches[0].y > 0 && touches[0].y < 50) {
+    // Vérifier si on touche le bouton univers
+    if (touches[0].x > 10 && touches[0].x < 40 && touches[0].y > 10 && touches[0].y < 40) {
       univers1 = !univers1;
       print("univers1 = " + univers1);
-    } else {
+    } 
+    // Vérifier si on touche le bouton info
+    else if (touches[0].x > 50 && touches[0].x < 80 && touches[0].y > 10 && touches[0].y < 40) {
+      infoON = !infoON;
+      print("infoON = " + infoON);
+    } 
+    else {
       let cell = getGridCell(touches[0].x, touches[0].y);
       for(let i = 0 ; i < audio.length ; i++){
         if (cell.id === i && !audio[i].isPlaying()) {
@@ -263,11 +281,17 @@ function touchStarted() {
 }
 
 function mousePressed() {
-  // Vérifier si on clique le bouton univers en haut à gauche
-  if (mouseX > 0 && mouseX < 50 && mouseY > 0 && mouseY < 50) {
+  // Vérifier si on clique le bouton univers
+  if (mouseX > 10 && mouseX < 40 && mouseY > 10 && mouseY < 40) {
     univers1 = !univers1;
     print("univers1 = " + univers1);
-  } else {
+  } 
+  // Vérifier si on clique le bouton info
+  else if (mouseX > 50 && mouseX < 80 && mouseY > 10 && mouseY < 40) {
+    infoON = !infoON;
+    print("infoON = " + infoON);
+  } 
+  else {
     let cell = getGridCell(mouseX, mouseY);
     for(let i = 0 ; i < audio.length ; i++){
       if (cell.id === i && !audio[i].isPlaying()) {
