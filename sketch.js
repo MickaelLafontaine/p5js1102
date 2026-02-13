@@ -51,12 +51,7 @@ function setup() {
     amp_smooth[i] = 0; // initialiser le smooth
   }
 
-  // Créer la checkbox pour basculer les univers
-  universeCheckbox = createCheckbox('Univers 2', false);
-  universeCheckbox.position(10, 10);
-  universeCheckbox.changed(() => {
-    univers1 = !universeCheckbox.checked();
-  });
+  // Les univers se basculent avec la zone en haut à gauche
 }
 
 // Retourne le numéro de la case cliquée (0 = première case en haut à gauche)
@@ -169,6 +164,16 @@ function draw(){
     }
   }
 
+  // Bouton pour basculer les univers en haut à gauche
+  fill(univers1 ? color(0, 100, 100) : color(240, 100, 100));
+  stroke(255);
+  strokeWeight(2);
+  rect(25, 25, 30, 30, 5);
+  fill(255);
+  textAlign(CENTER, CENTER);
+  textSize(12);
+  text(univers1 ? 'U1' : 'U2', 25, 25);
+
 }
 
 function windowResized() {
@@ -178,10 +183,16 @@ function windowResized() {
 function touchStarted() {
   userStartAudio(); // aide si l'audio est bloqué par la politique du navigateur
   if (touches.length > 0) {
-    let cell = getGridCell(touches[0].x, touches[0].y);
-    for(let i = 0 ; i < audio.length ; i++){
-      if (cell.id === i && !audio[i].isPlaying()) {
-        audio[i].play();
+    // Vérifier si on touche le bouton univers en haut à gauche
+    if (touches[0].x > 0 && touches[0].x < 50 && touches[0].y > 0 && touches[0].y < 50) {
+      univers1 = !univers1;
+      print("univers1 = " + univers1);
+    } else {
+      let cell = getGridCell(touches[0].x, touches[0].y);
+      for(let i = 0 ; i < audio.length ; i++){
+        if (cell.id === i && !audio[i].isPlaying()) {
+          audio[i].play();
+        }
       }
     }
     // Mark each touch point once with a circle.
@@ -193,10 +204,16 @@ function touchStarted() {
 }
 
 function mousePressed() {
-  let cell = getGridCell(mouseX, mouseY);
-  for(let i = 0 ; i < audio.length ; i++){
-    if (cell.id === i && !audio[i].isPlaying()) {
-      audio[i].play();
+  // Vérifier si on clique le bouton univers en haut à gauche
+  if (mouseX > 0 && mouseX < 50 && mouseY > 0 && mouseY < 50) {
+    univers1 = !univers1;
+    print("univers1 = " + univers1);
+  } else {
+    let cell = getGridCell(mouseX, mouseY);
+    for(let i = 0 ; i < audio.length ; i++){
+      if (cell.id === i && !audio[i].isPlaying()) {
+        audio[i].play();
+      }
     }
   }
 }
