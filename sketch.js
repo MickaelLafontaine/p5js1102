@@ -6,16 +6,16 @@ let mouseGridY = [];
 let infoON = true;// pour dessiner la grille d'interaction (smartphone)
 
 function preload() {
-    // on charge les fichiers audio
-  audio[0] = loadSound('assets/audio1.wav');
-  audio[1] = loadSound('assets/audio3.wav');
-  audio[2] = loadSound('assets/audio4.wav');
-  audio[3] = loadSound('assets/audio6.wav');
-  audio[4] = loadSound('assets/audio11.wav');
-  audio[5] = loadSound('assets/audio12.wav');
-  audio[6] = loadSound('assets/audio23.wav');
-  audio[7] = loadSound('assets/audio24.wav');
-  audio[8] = loadSound('assets/audio25.wav');
+    // on charge les fichiers audio - changé en MP3 pour meilleure compatibilité mobile
+  audio[0] = loadSound('assets/audio1.mp3');
+  audio[1] = loadSound('assets/audio3.mp3');
+  audio[2] = loadSound('assets/audio4.mp3');
+  audio[3] = loadSound('assets/audio6.mp3');
+  audio[4] = loadSound('assets/audio11.mp3');
+  audio[5] = loadSound('assets/audio12.mp3');
+  audio[6] = loadSound('assets/audio23.mp3');
+  audio[7] = loadSound('assets/audio24.mp3');
+  audio[8] = loadSound('assets/audio25.mp3');
 
   print("audio.length = " + audio.length);
 }
