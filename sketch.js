@@ -203,6 +203,32 @@ function draw(){
       text(audio[0].currentTime()*2,265,0);
       pop();
     }
+    // PLAN ? DÉDOUBLEMENT LETTRE //////////////////////////////////////////////////////
+    textSize(100);
+    if(audio[6].isPlaying()){
+      print("amp_smooth[6] = " + amp_smooth[6]);  // pour régler la valeur du 3e paramètre de la ligne suivante
+      let dedoublement = map(amp_smooth[6], 0, 0.6, 0, 200); // on convertit l'amplitude
+      noStroke();
+      fill('#3E805A')
+      text("A",windowWidth/4*1-dedoublement,windowHeight/2);
+      text("A",windowWidth/4*1+dedoublement,windowHeight/2);
+    }
+    if(audio[7].isPlaying()){
+      print("amp_smooth[7] = " + amp_smooth[7]);  // pour régler la valeur du 3e paramètre de la ligne suivante
+      let dedoublement = map(amp_smooth[7], 0, 0.6, 0, 200); // on convertit l'amplitude
+      noStroke();
+      fill('#E94956')
+      text("B",windowWidth/4*2-dedoublement,windowHeight/2);
+      text("B",windowWidth/4*2+dedoublement,windowHeight/2);
+    }
+    if(audio[8].isPlaying()){
+      print("amp_smooth[8] = " + amp_smooth[8]);  // pour régler la valeur du 3e paramètre de la ligne suivante
+      let dedoublement = map(amp_smooth[8], 0, 0.6, 0, 200); // on convertit l'amplitude
+      noStroke();
+      fill('#9A9B56')
+      text("C",windowWidth/4*3-dedoublement,windowHeight/2);
+      text("C",windowWidth/4*3+dedoublement,windowHeight/2);
+    }
   }
   else{    
     // PLAN 1 //////////////////////////////////////////////////////
