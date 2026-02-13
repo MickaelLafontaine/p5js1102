@@ -1,7 +1,7 @@
-let smoothingFactor = 0.5;// pour lisser les valeurs d'amplitude (0 = pas de lissage, 1 = lissage total)
+let smoothingFactor = 0.2;// pour lisser les valeurs d'amplitude (0 = pas de lissage, 1 = lissage total)
 let disque_dia = 0;// diamètre du disque qui tourne quand audio[0] est joué
 let rect_apparition = 0;// largeur du rectangle qui grandit quand audio[5] est joué
-let marge = 0;
+let marge = 100;
 let audio = [];
 let amp = [];
 let amp_smooth = [];
@@ -11,6 +11,11 @@ let mouseGridY = []; 
 let infoON = false;// pour dessiner la grille d'interaction (smartphone)
 let univers1 = true;// pour basculer entre les univers 1 et 2 (touche espace)
 let universeCheckbox; // checkbox pour basculer les univers
+
+// ghost trail oscillation (audio2)
+let osc_num = 60;// longueur du ghost trail
+let osc_x = [];
+let osc_y = [];
 
 function preload() {
     // on charge les fichiers audio - changé en MP3 pour meilleure compatibilité mobile
@@ -58,7 +63,11 @@ function setup() {
     amp_smooth[i] = 0; // initialiser le smooth
   }
 
-  // Les univers se basculent avec la zone en haut à gauche
+  // Initialisation des tableaux pour les oscillations (audio2)
+  for (let i = 0; i < osc_num; i++) {
+    osc_x[i] = 0;
+    osc_y[i] = 0;
+  }
 }
 
 // Retourne le numéro de la case cliquée (0 = première case en haut à gauche)
@@ -99,15 +108,20 @@ function draw(){
     background(0,0,100);
   }
 
+  let ncurrentsegment = 20;
+  //let ncurrentsegment = map(mouseY,0,height,0,nsegment+1);
+
+
+
 
   if(univers1){  
-    // PLAN 1 //////////////////////////////////////////////////////   
-    if(audio[2].isPlaying()){
-      //print("amp[2].getLevel() = " + amp[2].getLevel());  // pour régler la valeur du 3e paramètre de la ligne suivante
-      let flash = map(amp[2].getLevel(), 0, 0.6, 0, 100); 
+    // PLAN 1 FLASH //////////////////////////////////////////////////////   
+    if(audio[4].isPlaying()){
+      //print("amp[4].getLevel() = " + amp[4].getLevel());  // pour régler la valeur du 3e paramètre de la ligne suivante
+      let flash = map(amp[4].getLevel(), 0, 0.6, 0, 100); 
       background(color(317, 17, 85, flash));
     }
-    // PLAN 2 ///////////////////////////////////////////////////////   
+    // PLAN 2 APPARITION ///////////////////////////////////////////////////////   
     if(audio[5].isPlaying()){
       push();
       rectMode(CORNER);
@@ -122,15 +136,71 @@ function draw(){
     else{
       rect_apparition = 0;// on remet à zéro la largeur du rectangle quand le son n'est plus joué
     }
-    // PLAN ? ////////////////////////////////////////////////////// 
+    // PLAN ? ROTATION DE COORDONNÉES POLAIRES //////////////////////////////////////////////////////   
+    if(audio[1].isPlaying()){
+        push();
+        translate(width/2,height/2);
+        rotate((audio[1].currentTime()*2));
+        noStroke();
+        fill('#9A9B56');
+        noStroke();
+        for (let i = 0; i < ncurrentsegment; i++) { 
+            let angle = map(i, 0, ncurrentsegment, 0, TWO_PI);
+            let x = windowWidth / 2 + disque_dia * cos(angle);
+            let y = windowHeight / 2 + disque_dia * sin(angle);
+            circle(x-width/2,y-height/2,20)
+        }
+        pop();
+    }
+    // PLAN ? SIN WAVES  ///////////////////////////////////////////////////////   
+    if(audio[2].isPlaying()){
+        print("amp_smooth[2] = " + amp_smooth[2]);  // pour régler la valeur du 3e paramètre de la ligne suivante
+        oscillation = map(amp_smooth[2], 0, 0.6, marge, windowHeight-marge); // on convertit l'amplitude
+        let posX = map(audio[2].currentTime(), 0, audio[2].duration(), marge, windowWidth-marge);
+        for (var i = osc_num-1; i > 0; i--) {
+          osc_x[i] = osc_x[i-1];
+          osc_y[i] = osc_y[i-1];
+        }
+        osc_x[0] = posX;
+        osc_y[0] = oscillation;
+        noStroke();
+        stroke('#5E9F89');
+        if(posX>marge){
+          for (let i = 1; i < osc_num; i++) {
+            line(osc_x[i],osc_y[i],osc_x[i-1],osc_y[i-1]);
+          }
+        }
+        fill('#E94956');
+        noStroke(); 
+        circle(posX,oscillation,10);
+    }
+    else{
+        // on remet à zéro les positions d'oscillation quand le son n'est plus joué
+        posX = 0;
+        oscillation = 0;
+        for (let i = 0; i < osc_num; i++) {
+          osc_x[i] = 0;
+          osc_y[i] = 0;
+        }
+    }
+  
+      // PLAN ? // BOUNCE //////////////////////////////////////////////////////   
+    if(audio[3].isPlaying()){
+        print("amp_smooth[3] = " + amp_smooth[3]);
+        fill('#948D60');
+        noStroke();
+        circle(windowWidth/2,windowHeight/2,amp_smooth[3]*1000);
+    }
+    // PLAN ? ROTATION ////////////////////////////////////////////////////// 
     if(audio[0].isPlaying()){
-      //print("amp[0].getLevel() = " + amp[0].getLevel());
       push();
       translate(width/2,height/2);
       rotate((audio[0].currentTime()*2));
       noStroke();
       fill('#E94956');
       rect(0,0,disque_dia,25);
+      fill(0,0,100);
+      text(audio[0].currentTime()*2,265,0);
       pop();
     }
   }
@@ -170,6 +240,9 @@ function draw(){
       noStroke();
       fill('#E94956');
       rect(0,0,disque_dia,25);
+      textSize(20);
+      fill(0,0,100);
+      text(audio[0].currentTime()*2,0,0);
       pop();
     }
   }
@@ -195,6 +268,8 @@ function draw(){
    if(mouseIsPressed){
     let cell = getGridCell(mouseX, mouseY);
     print("Case: " + cell.id + " (x:" + cell.x + ", y:" + cell.y + ")");
+    print("mousePressed at (" + mouseX + ", " + mouseY + ")");
+
    }
 
 
