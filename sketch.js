@@ -7,6 +7,7 @@ let mouseGridX = [];
 let mouseGridY = [];
 let infoON = true;// pour dessiner la grille d'interaction (smartphone)
 let univers1 = true;// pour basculer entre les univers 1 et 2 (touche espace)
+let universeCheckbox; // checkbox pour basculer les univers
 
 function preload() {
     // on charge les fichiers audio - changé en MP3 pour meilleure compatibilité mobile
@@ -50,6 +51,12 @@ function setup() {
     amp_smooth[i] = 0; // initialiser le smooth
   }
 
+  // Créer la checkbox pour basculer les univers
+  universeCheckbox = createCheckbox('Univers 2', false);
+  universeCheckbox.position(10, 10);
+  universeCheckbox.changed(() => {
+    univers1 = !universeCheckbox.checked();
+  });
 }
 
 // Retourne le numéro de la case cliquée (0 = première case en haut à gauche)
