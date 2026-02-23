@@ -17,21 +17,33 @@ let osc_num = 60;// longueur du ghost trail
 let osc_x = [];
 let osc_y = [];
 
+// variables pour l'animation sine wave (univers 2)
+let xspacing = 10; // Distance between each horizontal location
+let w; // Width of entire wave
+let theta = 0.0; // Start angle at 0
+let amplitude = 75.0; // Height of wave
+let period = 500.0; // How many pixels before the wave repeats
+let dx; // Value for incrementing x
+let yvalues; // Using an array to store height values for the wave
+
 function preload() {
     // on charge les fichiers audio - changé en MP3 pour meilleure compatibilité mobile
-  audio[0] = loadSound('assets/audio1.mp3');
-  audio[1] = loadSound('assets/audio3.mp3');
-  audio[2] = loadSound('assets/audio4.mp3');
-  audio[3] = loadSound('assets/audio6.mp3');
-  audio[4] = loadSound('assets/audio11.mp3');
-  audio[5] = loadSound('assets/audio12.mp3');
-  audio[6] = loadSound('assets/audio23.mp3');
-  audio[7] = loadSound('assets/audio24.mp3');
-  audio[8] = loadSound('assets/audio25.mp3');
+  audio[0] = loadSound('assets/audio1.mp3'); // touche a
+  audio[1] = loadSound('assets/audio3.mp3'); // touche z
+  audio[2] = loadSound('assets/audio4.mp3'); // touche e
+  audio[3] = loadSound('assets/audio6.mp3'); // touche r
+  audio[4] = loadSound('assets/audio11.mp3'); // touche t
+  audio[5] = loadSound('assets/audio12.mp3'); // touche y
+  audio[6] = loadSound('assets/audio23.mp3'); // touche u
+  audio[7] = loadSound('assets/audio24.mp3'); // touche i
+  audio[8] = loadSound('assets/audio25.mp3'); // touche o
 
   print("audio.length = " + audio.length);
 }
 
+ /////////////////////////////////////////////////////////////////////////
+ // SETUP ////////////////////////////////////////////////////////////
+ /////////////////////////////////////////////////////////////////////////
 function setup() {
 
   createCanvas(windowWidth, windowHeight);
@@ -44,12 +56,9 @@ function setup() {
   }
   mouseGridX.push(windowWidth);
   mouseGridY.push(windowHeight);
-  //print("mouseGridX[1] = " + mouseGridX[1]);
-  //print("mouseGridY = " + mouseGridY);
   colorMode(HSB,360,100,100,100);
   rectMode(CENTER);
   background(220);
-  //text('tap here to play', 10, 20);
 
   // On règle la taille du disque afin qu'il soit responsive
   disque_dia = windowHeight/2; // le disque fera la moitié de la hauteur de l'écran
@@ -68,33 +77,17 @@ function setup() {
     osc_x[i] = 0;
     osc_y[i] = 0;
   }
-}
+  // Initiationalisation des paramètres pour les sine waves (audio2 univers 2)
+  w = width + 16;
+  dx = (TWO_PI / period) * xspacing;
+  yvalues = new Array(floor(w / xspacing));
 
-// Retourne le numéro de la case cliquée (0 = première case en haut à gauche)
-function getGridCell(mx, my) {
-  let cellX = -1;
-  let cellY = -1;
-  
-  for(let i = 0; i < mouseGridX.length - 1; i++) {
-    if(mx >= mouseGridX[i] && mx < mouseGridX[i + 1]) {
-      cellX = i;
-      break;
-    }
-  }
-  
-  for(let i = 0; i < mouseGridY.length - 1; i++) {
-    if(my >= mouseGridY[i] && my < mouseGridY[i + 1]) {
-      cellY = i;
-      break;
-    }
-  }
-  
-  if(cellX === -1) cellX = mouseGridX.length - 1;
-  if(cellY === -1) cellY = mouseGridY.length - 1;
-  
-  return { x: cellX, y: cellY, id: cellY * mouseGrid_Res + cellX };
-}
+} // fin du setup
 
+
+ /////////////////////////////////////////////////////////////////////////
+ // DRAW ////////////////////////////////////////////////////////////
+ /////////////////////////////////////////////////////////////////////////
 function draw(){
 
   for(let i = 0 ; i < audio.length ; i++){
@@ -109,19 +102,20 @@ function draw(){
   }
 
   let ncurrentsegment = 20;
-  //let ncurrentsegment = map(mouseY,0,height,0,nsegment+1);
+  //let ncurrentsegment = map(mouseY,0,height,0,nsegment+1); // pour faire varier le nombre de segments du disque en fonction de la position verticale de la souris (test)
 
 
-
-
+ /////////////////////////////////////////////////////////////////////////
+ // UNIVERS 1 ////////////////////////////////////////////////////////////
+ /////////////////////////////////////////////////////////////////////////
   if(univers1){  
-    // PLAN 1 FLASH //////////////////////////////////////////////////////   
+    // PLAN 0 FLASH //////////////////////////////////////////////////////   
     if(audio[4].isPlaying()){
       //print("amp[4].getLevel() = " + amp[4].getLevel());  // pour régler la valeur du 3e paramètre de la ligne suivante
       let flash = map(amp[4].getLevel(), 0, 0.6, 0, 100); 
       background(color(317, 17, 85, flash));
     }
-    // PLAN 2 APPARITION ///////////////////////////////////////////////////////   
+    // PLAN 1 APPARITION ///////////////////////////////////////////////////////   
     if(audio[5].isPlaying()){
       push();
       rectMode(CORNER);
@@ -136,7 +130,7 @@ function draw(){
     else{
       rect_apparition = 0;// on remet à zéro la largeur du rectangle quand le son n'est plus joué
     }
-    // PLAN ? ROTATION DE COORDONNÉES POLAIRES //////////////////////////////////////////////////////   
+    // PLAN 2 ROTATION DE COORDONNÉES POLAIRES //////////////////////////////////////////////////////   
     if(audio[1].isPlaying()){
         push();
         translate(width/2,height/2);
@@ -152,7 +146,7 @@ function draw(){
         }
         pop();
     }
-    // PLAN ? SIN WAVES  ///////////////////////////////////////////////////////   
+    // PLAN 3 SIN WAVES  ///////////////////////////////////////////////////////   
     if(audio[2].isPlaying()){
         print("amp_smooth[2] = " + amp_smooth[2]);  // pour régler la valeur du 3e paramètre de la ligne suivante
         oscillation = map(amp_smooth[2], 0, 0.6, marge, windowHeight-marge); // on convertit l'amplitude
@@ -184,14 +178,14 @@ function draw(){
         }
     }
   
-      // PLAN ? // BOUNCE //////////////////////////////////////////////////////   
+    // PLAN 4 // BOUNCE //////////////////////////////////////////////////////   
     if(audio[3].isPlaying()){
         print("amp_smooth[3] = " + amp_smooth[3]);
         fill('#948D60');
         noStroke();
         circle(windowWidth/2,windowHeight/2,amp_smooth[3]*1000);
     }
-    // PLAN ? ROTATION ////////////////////////////////////////////////////// 
+    // PLAN 5 ROTATION ////////////////////////////////////////////////////// 
     if(audio[0].isPlaying()){
       push();
       translate(width/2,height/2);
@@ -203,7 +197,7 @@ function draw(){
       text(audio[0].currentTime()*2,265,0);
       pop();
     }
-    // PLAN ? DÉDOUBLEMENT LETTRE //////////////////////////////////////////////////////
+    // PLAN 6 DÉDOUBLEMENT LETTRE //////////////////////////////////////////////////////
     textSize(100);
     if(audio[6].isPlaying()){
       print("amp_smooth[6] = " + amp_smooth[6]);  // pour régler la valeur du 3e paramètre de la ligne suivante
@@ -213,6 +207,8 @@ function draw(){
       text("A",windowWidth/4*1-dedoublement,windowHeight/2);
       text("A",windowWidth/4*1+dedoublement,windowHeight/2);
     }
+    
+    // PLAN 7 DÉDOUBLEMENT LETTRE //////////////////////////////////////////////////////
     if(audio[7].isPlaying()){
       print("amp_smooth[7] = " + amp_smooth[7]);  // pour régler la valeur du 3e paramètre de la ligne suivante
       let dedoublement = map(amp_smooth[7], 0, 0.6, 0, 200); // on convertit l'amplitude
@@ -221,6 +217,8 @@ function draw(){
       text("B",windowWidth/4*2-dedoublement,windowHeight/2);
       text("B",windowWidth/4*2+dedoublement,windowHeight/2);
     }
+  
+    // PLAN 8 DÉDOUBLEMENT LETTRE //////////////////////////////////////////////////////
     if(audio[8].isPlaying()){
       print("amp_smooth[8] = " + amp_smooth[8]);  // pour régler la valeur du 3e paramètre de la ligne suivante
       let dedoublement = map(amp_smooth[8], 0, 0.6, 0, 200); // on convertit l'amplitude
@@ -230,6 +228,10 @@ function draw(){
       text("C",windowWidth/4*3+dedoublement,windowHeight/2);
     }
   }
+
+ /////////////////////////////////////////////////////////////////////////
+ // UNIVERS 2 ////////////////////////////////////////////////////////////
+ /////////////////////////////////////////////////////////////////////////
   else{    
     // PLAN 1 //////////////////////////////////////////////////////
     if(audio[2].isPlaying()){
@@ -242,7 +244,8 @@ function draw(){
         circle(i,windowHeight,windowWidth/10 );
       }
     }
-      // PLAN 2 ///////////////////////////////////////////////////////   
+    
+    // PLAN 2 ///////////////////////////////////////////////////////   
     if(audio[5].isPlaying()){
       push();
       rectMode(CORNER);
@@ -257,20 +260,78 @@ function draw(){
     else{
       rect_apparition = 0;// on remet à zéro la largeur du rectangle quand le son n'est plus joué
     }
-   // PLAN ? ////////////////////////////////////////////////////// 
+    
+    // PLAN 3 SIN WAVES  ///////////////////////////////////////////////////////   
+    if(audio[2].isPlaying()){
+      // on calcule le mouvement des vagues
+      theta += 0.02;
+      let x = theta;
+      for (let i = 0; i < yvalues.length; i++) {
+        yvalues[i] = sin(x) * 250;// 500 est la hauteur des vagues, on peut régler ce paramètre pour faire des vagues plus ou moins hautes
+        x += dx;
+      }
+      // fin du calcul
+
+      // on dessine les vagues
+        fill('#5E9F89');
+        noStroke();
+        for (let x = 0; x < yvalues.length; x++) {
+          //let taille = map(x,0,yvalues.length,100,0);
+          ellipse(x * xspacing,height / 2 + yvalues[x],20, 20);
+        }
+
+    }
+
+  // PLAN 4 // BOUNCE //////////////////////////////////////////////////////   
+    if(audio[3].isPlaying()){
+        print("amp_smooth[3] = " + amp_smooth[3]);
+        fill('#948D60');
+        noStroke();
+        circle(windowWidth/2,windowHeight/2,amp_smooth[3]*1000);
+    }
+    // PLAN 5 ROTATION ////////////////////////////////////////////////////// 
     if(audio[0].isPlaying()){
-      //print("amp[0].getLevel() = " + amp[0].getLevel());
       push();
       translate(width/2,height/2);
       rotate((audio[0].currentTime()*2));
       noStroke();
       fill('#E94956');
       rect(0,0,disque_dia,25);
-      textSize(20);
       fill(0,0,100);
-      text(audio[0].currentTime()*2,0,0);
+      text(audio[0].currentTime()*2,265,0);
       pop();
     }
+    // PLAN 6 DÉDOUBLEMENT LETTRE //////////////////////////////////////////////////////
+    textSize(100);
+    if(audio[6].isPlaying()){
+      print("amp_smooth[6] = " + amp_smooth[6]);  // pour régler la valeur du 3e paramètre de la ligne suivante
+      let dedoublement = map(amp_smooth[6], 0, 0.6, 0, 200); // on convertit l'amplitude
+      noStroke();
+      fill('#3E805A')
+      text("A",windowWidth/4*1-dedoublement,windowHeight/2);
+      text("A",windowWidth/4*1+dedoublement,windowHeight/2);
+    }
+    
+    // PLAN 7 DÉDOUBLEMENT LETTRE //////////////////////////////////////////////////////
+    if(audio[7].isPlaying()){
+      print("amp_smooth[7] = " + amp_smooth[7]);  // pour régler la valeur du 3e paramètre de la ligne suivante
+      let dedoublement = map(amp_smooth[7], 0, 0.6, 0, 200); // on convertit l'amplitude
+      noStroke();
+      fill('#E94956')
+      text("B",windowWidth/4*2-dedoublement,windowHeight/2);
+      text("B",windowWidth/4*2+dedoublement,windowHeight/2);
+    }
+  
+    // PLAN 8 DÉDOUBLEMENT LETTRE //////////////////////////////////////////////////////
+    if(audio[8].isPlaying()){
+      print("amp_smooth[8] = " + amp_smooth[8]);  // pour régler la valeur du 3e paramètre de la ligne suivante
+      let dedoublement = map(amp_smooth[8], 0, 0.6, 0, 200); // on convertit l'amplitude
+      noStroke();
+      fill('#9A9B56')
+      text("C",windowWidth/4*3-dedoublement,windowHeight/2);
+      text("C",windowWidth/4*3+dedoublement,windowHeight/2);
+    }
+ 
   }
 
   // Animations standards pour tester que tout fonctionne bien
@@ -298,11 +359,14 @@ function draw(){
 
    }
 
-
-  
   if(infoON){     
     // Dessiner la grille
-    stroke(255);
+    if(univers1 == true){
+      stroke(255);// couleur des lignes de la grille pour l'univers 1
+    }
+    else{
+      stroke(0);// couleur des lignes de la grille pour l'univers 2
+    }
     strokeWeight(1);
     for(let x of mouseGridX) {
       line(x, 0, x, height);
@@ -346,63 +410,12 @@ function draw(){
   textSize(12);
   text(infoON ? 'I' : 'i', 65, 25);
 
-}
-
-function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
-}
-
-function touchStarted() {
-  userStartAudio(); // aide si l'audio est bloqué par la politique du navigateur
-  if (touches.length > 0) {
-    // Vérifier si on touche le bouton univers
-    if (touches[0].x > 10 && touches[0].x < 40 && touches[0].y > 10 && touches[0].y < 40) {
-      univers1 = !univers1;
-      print("univers1 = " + univers1);
-    } 
-    // Vérifier si on touche le bouton info
-    else if (touches[0].x > 50 && touches[0].x < 80 && touches[0].y > 10 && touches[0].y < 40) {
-      infoON = !infoON;
-      print("infoON = " + infoON);
-    } 
-    else {
-      let cell = getGridCell(touches[0].x, touches[0].y);
-      for(let i = 0 ; i < audio.length ; i++){
-        if (cell.id === i && !audio[i].isPlaying()) {
-          audio[i].play();
-        }
-      }
-    }
-    // Mark each touch point once with a circle.
-    for (let touch of touches) {
-      circle(touch.x, touch.y, 40);
-    }
-  }
-  return false; // empêche le scroll par défaut sur mobile
-}
-
-function mousePressed() {
-  // Vérifier si on clique le bouton univers
-  if (mouseX > 10 && mouseX < 40 && mouseY > 10 && mouseY < 40) {
-    univers1 = !univers1;
-    print("univers1 = " + univers1);
-  } 
-  // Vérifier si on clique le bouton info
-  else if (mouseX > 50 && mouseX < 80 && mouseY > 10 && mouseY < 40) {
-    infoON = !infoON;
-    print("infoON = " + infoON);
-  } 
-  else {
-    let cell = getGridCell(mouseX, mouseY);
-    for(let i = 0 ; i < audio.length ; i++){
-      if (cell.id === i && !audio[i].isPlaying()) {
-        audio[i].play();
-      }
-    }
-  }
-}
+} // fin du draw
 
 
+
+
+// Permet de jouer les sons avec les touches du clavier (a, z, e, r, t, y, u, i, o)
 function keyPressed() {
     if(key == ' '){
       univers1 = !univers1;
@@ -437,10 +450,91 @@ function keyPressed() {
     }
 }
 
-/** 
-function canvasPressed() {
-  // playing a sound file on a user gesture
-  // is equivalent to `userStartAudio()`
-  mySound.play();
+
+
+
+ /////////////////////////////////////////////////////////////////////////
+ // NE PAS TOUCHER CI-DESSSOUS ///////////////////////////////////////////
+ /////////////////////////////////////////////////////////////////////////
+ 
+// Permet de jouer les sons en touchant l'écran (pour mobile)
+function touchStarted() {
+  userStartAudio(); // aide si l'audio est bloqué par la politique du navigateur
+  if (touches.length > 0) {
+    // Vérifier si on touche le bouton univers
+    if (touches[0].x > 10 && touches[0].x < 40 && touches[0].y > 10 && touches[0].y < 40) {
+      univers1 = !univers1;
+      print("univers1 = " + univers1);
+    } 
+    // Vérifier si on touche le bouton info
+    else if (touches[0].x > 50 && touches[0].x < 80 && touches[0].y > 10 && touches[0].y < 40) {
+      infoON = !infoON;
+      print("infoON = " + infoON);
+    } 
+    else {
+      let cell = getGridCell(touches[0].x, touches[0].y);
+      for(let i = 0 ; i < audio.length ; i++){
+        if (cell.id === i && !audio[i].isPlaying()) {
+          audio[i].play();
+        }
+      }
+    }
+    // Mark each touch point once with a circle.
+    for (let touch of touches) {
+      circle(touch.x, touch.y, 40);
+    }
+  }
+  return false; // empêche le scroll par défaut sur mobile
 }
-*/
+
+// Permet de jouer les sons en cliquant avec la souris (pour desktop)
+function mousePressed() {
+  // Vérifier si on clique le bouton univers
+  if (mouseX > 10 && mouseX < 40 && mouseY > 10 && mouseY < 40) {
+    univers1 = !univers1;
+    print("univers1 = " + univers1);
+  } 
+  // Vérifier si on clique le bouton info
+  else if (mouseX > 50 && mouseX < 80 && mouseY > 10 && mouseY < 40) {
+    infoON = !infoON;
+    print("infoON = " + infoON);
+  } 
+  else {
+    let cell = getGridCell(mouseX, mouseY);
+    for(let i = 0 ; i < audio.length ; i++){
+      if (cell.id === i && !audio[i].isPlaying()) {
+        audio[i].play();
+      }
+    }
+  }
+}
+
+// Permet de redimensionner le canvas si la fenêtre change de taille
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
+}
+
+// Retourne le numéro de la case cliquée (0 = première case en haut à gauche)
+function getGridCell(mx, my) {
+  let cellX = -1;
+  let cellY = -1;
+  
+  for(let i = 0; i < mouseGridX.length - 1; i++) {
+    if(mx >= mouseGridX[i] && mx < mouseGridX[i + 1]) {
+      cellX = i;
+      break;
+    }
+  }
+  
+  for(let i = 0; i < mouseGridY.length - 1; i++) {
+    if(my >= mouseGridY[i] && my < mouseGridY[i + 1]) {
+      cellY = i;
+      break;
+    }
+  }
+  
+  if(cellX === -1) cellX = mouseGridX.length - 1;
+  if(cellY === -1) cellY = mouseGridY.length - 1;
+  
+  return { x: cellX, y: cellY, id: cellY * mouseGrid_Res + cellX };
+}
